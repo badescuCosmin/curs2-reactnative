@@ -1,14 +1,31 @@
-import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, ScrollView, StyleSheet, StatusBar } from "react-native";
+import {
+  ActivityIndicatorComponent,
+  Button,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  FlatList,
+  Image,
+  Modal,
+  StatusBarComponent,
+  SwitchComponent,
+  TextInputComponent,
+} from "./src/components";
 
 export default function App() {
-  const x = 2;
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaView style={styles.container}>
+      <ScrollView>
+        <StatusBarComponent />
+        <ActivityIndicatorComponent />
+        <Button />
+        <Image />
+        <Modal />
+        <SwitchComponent />
+        <TextInputComponent />
+      </ScrollView>
+      {/* <FlatList /> */}
+    </SafeAreaView>
   );
 }
 
@@ -16,7 +33,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+    marginBottom: 20,
+    marginTop: StatusBar.currentHeight,
   },
 });
