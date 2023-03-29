@@ -1,23 +1,25 @@
 import React, { useState } from "react";
-import { Text } from "../text";
 import {
-  TextInput as NativeTextInput,
   StyleSheet,
-  TextStyle,
+  TextInput as NativeTextInput,
   TextInputProps as NativeTextInputProps,
+  TextStyle,
 } from "react-native";
+import { ThemeColors } from "../../utils/theme/colors";
 import { spacing } from "../../utils/theme/spacing";
 import { useThemeConsumer } from "../../utils/theme/theme.consumer";
-import { ThemeColors } from "../../utils/theme/colors";
+import { Text } from "../text";
 
 interface TextInputProps extends NativeTextInputProps {
   textStyle?: TextStyle;
+  hasError?: boolean;
   label: string;
   onChangeText: (e: string) => void;
 }
 
 export const TextInput = ({
   textStyle,
+  hasError,
   label,
   onChangeText,
   ...props
@@ -32,7 +34,10 @@ export const TextInput = ({
     <>
       <Text sx={textStyle}>{label}</Text>
       <NativeTextInput
-        style={textInputStyles.container}
+        style={{
+          ...textInputStyles.container,
+          ...(hasError && textInputStyles.error),
+        }}
         onChangeText={(e) => {
           onChangeText(e);
           setValue(e);
@@ -54,5 +59,9 @@ const styles = (colors: ThemeColors) =>
       paddingHorizontal: 20,
       borderColor: colors.text,
       marginTop: spacing(2),
+    },
+    error: {
+      borderColor: colors.error,
+      color: colors.error,
     },
   });

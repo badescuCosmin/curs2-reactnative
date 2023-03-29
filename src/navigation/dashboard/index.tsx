@@ -1,14 +1,14 @@
-import React from "react";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import React from "react";
 import Home from "../../screens/Home";
 import Settings from "../../screens/Settings";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { RootStackParamList } from "../navigator.types";
 import { useThemeConsumer } from "../../utils/theme/theme.consumer";
+import { RootStackParamList } from "../navigator.types";
 
 const Tab = createBottomTabNavigator<RootStackParamList>();
 
-export const Dashboard = () => {
+export const DashboardNavigator = () => {
   const {
     theme: {
       colors: { primary, secondary },
