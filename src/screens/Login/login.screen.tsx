@@ -1,36 +1,72 @@
-import { Alert, SafeAreaView, View } from "react-native";
-import React from "react";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Text, Button } from "../../components";
-import loginStyles from "./login.styles";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import React, { useState } from "react";
+import { SafeAreaView, View } from "react-native";
+import { Button, Text } from "../../components";
 import { TextInput } from "../../components/text-input";
-import { useThemeConsumer } from "../../utils/theme/theme.consumer";
 import { RootStackParamList } from "../../navigation/navigator.types";
+import { auth } from "../../utils/firebase";
+import { useThemeConsumer } from "../../utils/theme/theme.consumer";
+import loginStyles from "./login.styles";
 
 type LoginProps = NativeStackScreenProps<RootStackParamList, "Login">;
 
 const Login = ({ navigation }: LoginProps) => {
+  const [loginForm, setLoginForm] = useState({
+    email: "",
+    password: "",
+  });
+  const [error, setError] = useState("");
+
   const {
     theme: { colors },
     toggleThemeSchema,
   } = useThemeConsumer();
 
   const styles = loginStyles(colors);
+
+  const signIn = async () => {
+    try {
+      await signInWithEmailAndPassword(
+        auth,
+        loginForm.email,
+        loginForm.password
+      );
+    } catch (e) {
+      setError((e as { message: string }).message);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.authContainer}>
       <Text sx={styles.signInLabel} variant="title">
         Sign in
       </Text>
-      <TextInput label="Email" onChangeText={(e) => console.log(e)} />
+      <TextInput
+        label="Email"
+        onChangeText={(text) =>
+          setLoginForm({
+            ...loginForm,
+            email: text,
+          })
+        }
+      />
       <TextInput
         textStyle={styles.passwordInput}
         label="Password"
-        onChangeText={(e) => console.log(e)}
+        secureTextEntry
+        onChangeText={(text) =>
+          setLoginForm({
+            ...loginForm,
+            password: text,
+          })
+        }
       />
+      {error && <Text sx={styles.errorMessage}>{error}</Text>}
       <Button
         sx={styles.signInButton}
-        onPress={() => Alert.alert("sss")}
+        onPress={() => signIn()}
         title="Sign in"
       />
       <Button

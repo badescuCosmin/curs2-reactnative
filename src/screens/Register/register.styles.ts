@@ -16,10 +16,10 @@ const styles = (colors: ThemeColors) =>
       fontWeight: "500",
       fontSize: 14,
     },
-    signInLabel: {
+    signUpLabel: {
       marginBottom: spacing(5),
     },
-    signInButton: {
+    signUpButton: {
       marginVertical: spacing(5),
     },
     passwordInput: {
