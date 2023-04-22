@@ -12,7 +12,7 @@ import registerStyles from "./register.styles";
 
 type RegisterProps = NativeStackScreenProps<RootStackParamList, "Register">;
 
-const Login = ({ navigation }: RegisterProps) => {
+const Register = ({ navigation }: RegisterProps) => {
   const [registerForm, setRegisterForm] = useState({
     email: "",
     password: "",
@@ -25,20 +25,19 @@ const Login = ({ navigation }: RegisterProps) => {
 
   const styles = registerStyles(colors);
 
-  const signUp = async () => {
+  const clearError = () => setError("");
+
+  const handleRegister = async () => {
     try {
       await createUserWithEmailAndPassword(
         auth,
         registerForm.email,
         registerForm.password
       );
-    } catch (e) {
-      setError((e as { message: string }).message);
+    } catch (err: any) {
+      setError(err.message);
+      console.error(err);
     }
-  };
-
-  const clearError = () => {
-    setError("");
   };
 
   return (
@@ -47,9 +46,12 @@ const Login = ({ navigation }: RegisterProps) => {
         Sign up
       </Text>
       <TextInput
-        value={registerForm.email}
+        onFocus={clearError}
         label="Email"
-        onBlur={clearError}
+        value={registerForm.email}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        autoCorrect={false}
         onChangeText={(text) =>
           setRegisterForm({
             ...registerForm,
@@ -58,11 +60,11 @@ const Login = ({ navigation }: RegisterProps) => {
         }
       />
       <TextInput
-        value={registerForm.password}
+        onFocus={clearError}
         textStyle={styles.passwordInput}
         label="Password"
+        value={registerForm.password}
         secureTextEntry
-        onBlur={clearError}
         onChangeText={(text) =>
           setRegisterForm({
             ...registerForm,
@@ -70,12 +72,12 @@ const Login = ({ navigation }: RegisterProps) => {
           })
         }
       />
-      {error && <Text sx={styles.errorMessage}>{error}</Text>}
       <Button
         sx={styles.signUpButton}
-        onPress={() => signUp()}
+        onPress={handleRegister}
         title="Sign up"
       />
+      {error && <Text sx={styles.errorText}>{error}</Text>}
       <View style={styles.orContainer}>
         <View style={styles.orContainerLine} />
         <Text>OR</Text>
@@ -89,7 +91,7 @@ const Login = ({ navigation }: RegisterProps) => {
         </View>
       </View>
       <View style={styles.newAccount}>
-        <Text>Do you already have an account?</Text>
+        <Text>Do you have an account?</Text>
         <Text
           onPress={() => navigation.navigate("Login")}
           sx={styles.createNewAccount}
@@ -101,4 +103,4 @@ const Login = ({ navigation }: RegisterProps) => {
   );
 };
 
-export default Login;
+export default Register;

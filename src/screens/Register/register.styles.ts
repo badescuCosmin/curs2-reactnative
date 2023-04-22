@@ -10,11 +10,10 @@ const styles = (colors: ThemeColors) =>
       flex: 1,
       marginTop: spacing(6),
     },
-    errorMessage: {
-      marginTop: spacing(3),
+    errorText: {
       color: colors.error,
+      fontSize: 16,
       fontWeight: "500",
-      fontSize: 14,
     },
     signUpLabel: {
       marginBottom: spacing(5),

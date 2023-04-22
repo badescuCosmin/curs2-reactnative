@@ -1,90 +1,103 @@
-import { addDoc, collection, getDocs } from "firebase/firestore";
+import {
+  Timestamp,
+  addDoc,
+  collection,
+  getDocs,
+  onSnapshot,
+} from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { FlatList, SafeAreaView, Text, View } from "react-native";
+import { SafeAreaView, Text, View } from "react-native";
 import { Button, TextInput } from "../../components";
-import { Post } from "../../modules";
-import { auth, firestore } from "../../utils/firebase";
-import { IPost } from "../../utils/types";
+import { auth, db } from "../../utils/firebase";
+import { IMessage } from "../../utils/types";
+import homeStyles from "./home.styles";
 
 const Home = () => {
-  const [posts, setPosts] = useState<IPost[]>([]);
-  const [content, setContent] = useState("");
+  const [messages, setMessages] = useState<IMessage[]>([]);
+  const [message, setMessage] = useState("");
 
-  const getPosts = async () => {
-    const collectionRef = collection(firestore, "posts");
-    const collectionOfPosts = await getDocs(collectionRef);
-
-    let postsArray: IPost[] = [];
-    collectionOfPosts.forEach((post) => {
-      const postData = post.data();
-      console.log(postData);
-      postsArray.push({
-        id: postData.id,
-        content: postData.content,
-        createdAt: postData.createdAt.seconds,
-        userId: postData.userId,
+  const getMessages = async () => {
+    try {
+      const messagesDocs = await getDocs(collection(db, "messages"));
+      let messages: IMessage[] = [];
+      messagesDocs.forEach((message) => {
+        const data = message.data();
+        messages.push({
+          id: message.id,
+          message: data.message,
+          timestamp: data.timestamp.toDate(),
+          userId: data.userId,
+        });
       });
-    });
+      setMessages(messages);
+    } catch (err: any) {
+      console.log(err.message);
+    }
+  };
 
-    setPosts(postsArray);
+  const sendMessage = async () => {
+    try {
+      await addDoc(collection(db, "messages"), {
+        message: message,
+        userId: auth.currentUser?.uid,
+        timestamp: Timestamp.fromDate(new Date()),
+      });
+      setMessage("");
+    } catch (err: any) {
+      console.log(err.message);
+    }
   };
 
   useEffect(() => {
-    getPosts();
-  }, []);
+    getMessages();
 
-  const addPost = async () => {
-    const collectionRef = collection(firestore, "posts");
+    const unsubscribe = onSnapshot(
+      collection(db, "messages"),
+      (firebaseMessages) => {
+        const newMessages = [...messages];
+        firebaseMessages.forEach((message) => {
+          newMessages.push({
+            id: message.id,
+            message: message.data().message,
+            timestamp: message.data().timestamp.toDate(),
+            userId: message.data().userId,
+          });
+        });
+        setMessages(newMessages);
+      }
+    );
 
-    const seconds = Math.floor(new Date().getTime() / 1000);
-    await addDoc(collectionRef, {
-      userId: auth.currentUser?.uid,
-      content: content,
-      id: "4",
-      createdAt: {
-        seconds,
-        nanoseconds: 0,
-      },
-    });
-  };
+    return unsubscribe;
+  }, [messages]);
+
+  const styles = homeStyles();
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ padding: 10 }}>
-        <Text>Hello {auth.currentUser?.email}</Text>
-        <FlatList
-          data={posts}
-          keyExtractor={(item) => item.id}
-          ItemSeparatorComponent={() => <View style={{ padding: 5 }} />}
-          renderItem={({ item }) => <Post post={item} />}
+    <SafeAreaView>
+      <View style={{ width: "100%", padding: 10 }}>
+        {messages.map((message) => (
+          <View key={message.id} style={styles.messageContainer}>
+            <Text>{message.userId}</Text>
+            <Text>{message.message}</Text>
+            <Text>{message.timestamp.toLocaleString()}</Text>
+          </View>
+        ))}
+      </View>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 20,
+          padding: 10,
+        }}
+      >
+        <TextInput
+          viewStyle={{ flex: 1 }}
+          label="Message"
+          onChangeText={setMessage}
+          value={message}
         />
-        <View
-          style={{
-            flexDirection: "row",
-            marginTop: 50,
-            alignItems: "center",
-            gap: 10,
-          }}
-        >
-          <TextInput
-            containerStyle={{
-              flex: 1,
-            }}
-            value={content}
-            label="Add a post"
-            onChangeText={setContent}
-          />
-          <Button
-            title="Post!"
-            disabled={!content}
-            onPress={() => {
-              addPost();
-            }}
-            sx={{
-              width: 100,
-            }}
-          />
-        </View>
+        <Button title="Send" sx={{ width: 100 }} onPress={sendMessage} />
       </View>
     </SafeAreaView>
   );

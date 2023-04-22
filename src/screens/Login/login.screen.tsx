@@ -21,22 +21,23 @@ const Login = ({ navigation }: LoginProps) => {
 
   const {
     theme: { colors },
-    toggleThemeSchema,
   } = useThemeConsumer();
 
-  const styles = loginStyles(colors);
+  const clearError = () => setError("");
 
-  const signIn = async () => {
+  const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(
         auth,
         loginForm.email,
         loginForm.password
       );
-    } catch (e) {
-      setError((e as { message: string }).message);
+    } catch (err: any) {
+      setError(err.message);
     }
   };
+
+  const styles = loginStyles(colors);
 
   return (
     <SafeAreaView style={styles.authContainer}>
@@ -44,7 +45,12 @@ const Login = ({ navigation }: LoginProps) => {
         Sign in
       </Text>
       <TextInput
+        onFocus={clearError}
         label="Email"
+        value={loginForm.email}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        autoCorrect={false}
         onChangeText={(text) =>
           setLoginForm({
             ...loginForm,
@@ -53,8 +59,10 @@ const Login = ({ navigation }: LoginProps) => {
         }
       />
       <TextInput
+        onFocus={clearError}
         textStyle={styles.passwordInput}
         label="Password"
+        value={loginForm.password}
         secureTextEntry
         onChangeText={(text) =>
           setLoginForm({
@@ -63,22 +71,8 @@ const Login = ({ navigation }: LoginProps) => {
           })
         }
       />
-      {error && <Text sx={styles.errorMessage}>{error}</Text>}
-      <Button
-        sx={styles.signInButton}
-        onPress={() => signIn()}
-        title="Sign in"
-      />
-      <Button
-        title="Forgot Password ?"
-        variant="tertiary"
-        sx={{
-          width: 140,
-          marginLeft: "auto",
-          alignItems: "flex-end",
-        }}
-        onPress={() => toggleThemeSchema()}
-      />
+      <Button sx={styles.signInButton} onPress={handleLogin} title="Sign in" />
+      {error && <Text sx={styles.errorText}>{error}</Text>}
       <View style={styles.orContainer}>
         <View style={styles.orContainerLine} />
         <Text>OR</Text>

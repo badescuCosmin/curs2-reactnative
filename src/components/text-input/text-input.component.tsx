@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import {
-  StyleProp,
-  StyleSheet,
   TextInput as NativeTextInput,
   TextInputProps as NativeTextInputProps,
+  StyleProp,
+  StyleSheet,
   TextStyle,
   View,
   ViewStyle,
@@ -14,9 +14,10 @@ import { useThemeConsumer } from "../../utils/theme/theme.consumer";
 import { Text } from "../text";
 
 interface TextInputProps extends NativeTextInputProps {
+  textStyle?: TextStyle;
+  viewStyle?: StyleProp<ViewStyle>;
   label: string;
   onChangeText: (e: string) => void;
-  textStyle?: TextStyle;
   containerStyle?: StyleProp<ViewStyle>;
 }
 
@@ -24,7 +25,7 @@ export const TextInput = ({
   textStyle,
   label,
   onChangeText,
-  containerStyle,
+  viewStyle,
   ...props
 }: TextInputProps) => {
   const [value, setValue] = useState("");
@@ -34,7 +35,7 @@ export const TextInput = ({
 
   const textInputStyles = styles(colors);
   return (
-    <View style={containerStyle}>
+    <View style={viewStyle}>
       <Text sx={textStyle}>{label}</Text>
       <NativeTextInput
         style={textInputStyles.container}

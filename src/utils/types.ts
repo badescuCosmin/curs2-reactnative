@@ -1,6 +1,6 @@
-export interface IPost {
+export interface IMessage {
   id: string;
+  message: string;
+  timestamp: Date;
   userId: string;
-  content: string;
-  createdAt: number;
 }

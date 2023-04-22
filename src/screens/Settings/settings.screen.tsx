@@ -1,36 +1,32 @@
 import { signOut } from "firebase/auth";
 import React from "react";
-import { SafeAreaView } from "react-native";
-import { Button, Text } from "../../components";
+import { SafeAreaView, View } from "react-native";
+import { Button } from "../../components";
 import { auth } from "../../utils/firebase";
 
-const Settings = () => (
-  <SafeAreaView
-    style={{
-      flex: 1,
-      alignItems: "center",
-    }}
-  >
-    <Text
-      sx={{
-        fontSize: 14,
-        marginTop: 20,
-      }}
-    >
-      You are logged in as:
-    </Text>
-    <Text>{auth.currentUser?.email}</Text>
-    <Button
-      title="Sign out"
-      sx={{
-        width: "50%",
-        marginTop: 20,
-      }}
-      onPress={() => {
-        signOut(auth);
-      }}
-    />
-  </SafeAreaView>
-);
+const Settings = () => {
+  console.log(auth.currentUser);
+  return (
+    <SafeAreaView>
+      <View
+        style={{
+          alignItems: "center",
+          flexDirection: "column",
+          marginTop: 20,
+        }}
+      >
+        <Button
+          title="Sign Out"
+          sx={{
+            width: 150,
+          }}
+          onPress={() => {
+            signOut(auth);
+          }}
+        />
+      </View>
+    </SafeAreaView>
+  );
+};
 
 export default Settings;
