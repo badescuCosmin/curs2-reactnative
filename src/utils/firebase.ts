@@ -1,21 +1,15 @@
+import Constants from "expo-constants";
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
 
-// Aici se pune config-ul de firebase
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: "",
+  apiKey: Constants.manifest?.extra?.apiKey,
+  authDomain: Constants.manifest?.extra?.authDomain,
+  projectId: Constants.manifest?.extra?.projectId,
+  storageBucket: Constants.manifest?.extra?.storageBucket,
+  messagingSenderId: Constants.manifest?.extra?.messagingSenderId,
+  appId: Constants.manifest?.extra?.appId,
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-
-export const firestore = getFirestore(app);
-export const auth = getAuth(app);
-
-export default app;
+export const app = initializeApp(firebaseConfig);
