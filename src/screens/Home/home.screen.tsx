@@ -6,7 +6,7 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { SafeAreaView, Text, View } from "react-native";
+import { SafeAreaView, ScrollView, Text, View } from "react-native";
 import { Button, TextInput } from "../../components";
 import { auth, db } from "../../utils/firebase";
 import { IMessage } from "../../utils/types";
@@ -73,16 +73,16 @@ const Home = () => {
   const styles = homeStyles();
 
   return (
-    <SafeAreaView>
-      <View style={{ width: "100%", padding: 10 }}>
-        {messages.map((message) => (
-          <View key={message.id} style={styles.messageContainer}>
-            <Text>{message.userId}</Text>
-            <Text>{message.message}</Text>
-            <Text>{message.timestamp.toLocaleString()}</Text>
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView style={{ width: "100%", padding: 10 }}>
+        {messages.map((m) => (
+          <View key={m.id} style={styles.messageContainer}>
+            <Text>{m.userId}</Text>
+            <Text>{m.message}</Text>
+            <Text>{m.timestamp.toLocaleString()}</Text>
           </View>
         ))}
-      </View>
+      </ScrollView>
       <View
         style={{
           flexDirection: "row",

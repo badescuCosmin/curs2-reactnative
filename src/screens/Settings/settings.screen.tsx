@@ -5,7 +5,6 @@ import { Button } from "../../components";
 import { auth } from "../../utils/firebase";
 
 const Settings = () => {
-  console.log(auth.currentUser);
   return (
     <SafeAreaView>
       <View
