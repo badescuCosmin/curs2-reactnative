@@ -8,17 +8,18 @@ import {
 } from "firebase/firestore";
 import _ from "lodash";
 import React, { useCallback, useEffect, useState } from "react";
-import { SafeAreaView, ScrollView, Text, View } from "react-native";
+import { SafeAreaView, ScrollView, View } from "react-native";
 import { Button, TextInput } from "../../components";
+import { Message } from "../../components/Message";
 import { useUsername } from "../../hooks/useUsername";
 import { auth, db } from "../../utils/firebase";
+import { sendPushNotification } from "../../utils/notification";
 import { IMessage } from "../../utils/types";
-import homeStyles from "./home.styles";
 
 const Home = () => {
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [message, setMessage] = useState("");
-  const { username, getUsernameFromAsyncStorage } = useUsername();
+  const { getUsernameFromAsyncStorage } = useUsername();
 
   const getMessages = async () => {
     try {
@@ -74,6 +75,7 @@ const Home = () => {
           });
         });
         setMessages(_.uniqBy(newMessages, "id"));
+        sendPushNotification("New message", "Someone posted a new message!");
       }
     );
 
@@ -81,23 +83,13 @@ const Home = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const styles = homeStyles();
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView style={{ width: "100%", padding: 10 }}>
         {messages
           .sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1))
           .map((m) => (
-            <View key={m.id} style={styles.messageContainer}>
-              <Text>
-                {m.userId === auth.currentUser?.uid && !!username
-                  ? username
-                  : m.userId}
-              </Text>
-              <Text>{m.message}</Text>
-              <Text>{m.timestamp.toLocaleString()}</Text>
-            </View>
+            <Message key={m.id} message={m} />
           ))}
       </ScrollView>
       <View
