@@ -1,3 +1,4 @@
+import { useFocusEffect } from "@react-navigation/native";
 import {
   Timestamp,
   addDoc,
@@ -5,9 +6,11 @@ import {
   getDocs,
   onSnapshot,
 } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import _ from "lodash";
+import React, { useCallback, useEffect, useState } from "react";
 import { SafeAreaView, ScrollView, Text, View } from "react-native";
 import { Button, TextInput } from "../../components";
+import { useUsername } from "../../hooks/useUsername";
 import { auth, db } from "../../utils/firebase";
 import { IMessage } from "../../utils/types";
 import homeStyles from "./home.styles";
@@ -15,6 +18,7 @@ import homeStyles from "./home.styles";
 const Home = () => {
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [message, setMessage] = useState("");
+  const { username, getUsernameFromAsyncStorage } = useUsername();
 
   const getMessages = async () => {
     try {
@@ -48,6 +52,12 @@ const Home = () => {
     }
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      getUsernameFromAsyncStorage();
+    }, [getUsernameFromAsyncStorage])
+  );
+
   useEffect(() => {
     getMessages();
 
@@ -63,25 +73,32 @@ const Home = () => {
             userId: message.data().userId,
           });
         });
-        setMessages(newMessages);
+        setMessages(_.uniqBy(newMessages, "id"));
       }
     );
 
     return unsubscribe;
-  }, [messages]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const styles = homeStyles();
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView style={{ width: "100%", padding: 10 }}>
-        {messages.map((m) => (
-          <View key={m.id} style={styles.messageContainer}>
-            <Text>{m.userId}</Text>
-            <Text>{m.message}</Text>
-            <Text>{m.timestamp.toLocaleString()}</Text>
-          </View>
-        ))}
+        {messages
+          .sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1))
+          .map((m) => (
+            <View key={m.id} style={styles.messageContainer}>
+              <Text>
+                {m.userId === auth.currentUser?.uid && !!username
+                  ? username
+                  : m.userId}
+              </Text>
+              <Text>{m.message}</Text>
+              <Text>{m.timestamp.toLocaleString()}</Text>
+            </View>
+          ))}
       </ScrollView>
       <View
         style={{
