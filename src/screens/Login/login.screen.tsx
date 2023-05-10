@@ -1,48 +1,83 @@
-import { Alert, SafeAreaView, View } from "react-native";
-import React from "react";
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { Text, Button } from "../../components";
-import loginStyles from "./login.styles";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import React from "react";
+import { SafeAreaView, View } from "react-native";
+import { Button, Text } from "../../components";
 import { TextInput } from "../../components/text-input";
-import { useThemeConsumer } from "../../utils/theme/theme.consumer";
 import { RootStackParamList } from "../../navigation/navigator.types";
+import { auth } from "../../utils/firebase";
+import { useThemeConsumer } from "../../utils/theme/theme.consumer";
+import loginStyles from "./login.styles";
 
 type LoginProps = NativeStackScreenProps<RootStackParamList, "Login">;
 
 const Login = ({ navigation }: LoginProps) => {
+  const [value, setValue] = React.useState({
+    email: "",
+    password: "",
+    error: "",
+  });
+
   const {
     theme: { colors },
-    toggleThemeSchema,
   } = useThemeConsumer();
 
   const styles = loginStyles(colors);
+
+  const signIn = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, value.email, value.password);
+      navigation.navigate("Login");
+    } catch (e) {
+      setValue({
+        ...value,
+        error: (e as { message: string }).message,
+      });
+    }
+  };
+
+  const onBlur = () => {
+    if (value.error) {
+      setValue({
+        ...value,
+        error: "",
+      });
+    }
+  };
+
   return (
     <SafeAreaView style={styles.authContainer}>
       <Text sx={styles.signInLabel} variant="title">
         Sign in
       </Text>
-      <TextInput label="Email" onChangeText={(e) => console.log(e)} />
+      <TextInput
+        label="Email"
+        onBlur={onBlur}
+        hasError={!!value.error}
+        keyboardType="email-address"
+        onChangeText={(e) =>
+          setValue({
+            ...value,
+            email: e,
+          })
+        }
+      />
       <TextInput
         textStyle={styles.passwordInput}
         label="Password"
-        onChangeText={(e) => console.log(e)}
+        secureTextEntry
+        onBlur={onBlur}
+        hasError={!!value.error}
+        onChangeText={(e) =>
+          setValue({
+            ...value,
+            password: e,
+          })
+        }
       />
-      <Button
-        sx={styles.signInButton}
-        onPress={() => Alert.alert("sss")}
-        title="Sign in"
-      />
-      <Button
-        title="Forgot Password ?"
-        variant="tertiary"
-        sx={{
-          width: 140,
-          marginLeft: "auto",
-          alignItems: "flex-end",
-        }}
-        onPress={() => toggleThemeSchema()}
-      />
+      <Button sx={styles.signInButton} onPress={signIn} title="Sign in" />
+
       <View style={styles.orContainer}>
         <View style={styles.orContainerLine} />
         <Text>OR</Text>
