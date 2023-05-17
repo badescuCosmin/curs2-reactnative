@@ -6,8 +6,7 @@ import {
   initializeAuth,
 } from "firebase/auth/react-native";
 import { getFirestore } from "firebase/firestore";
-
-console.log(Constants.manifest?.extra);
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: Constants.manifest?.extra?.apiKey,
@@ -25,5 +24,7 @@ export const auth = initializeAuth(app, {
 });
 
 export const firestore = getFirestore(app);
+
+export const storage = getStorage(app);
 
 export default app;

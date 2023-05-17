@@ -52,7 +52,7 @@ const Home = () => {
           data={posts}
           keyExtractor={(item) => item.id}
           ItemSeparatorComponent={() => <View style={{ padding: 5 }} />}
-          renderItem={({ item }) => <Post post={item} />}
+          renderItem={({ item, index }) => <Post index={index} post={item} />}
         />
         <View
           style={{
